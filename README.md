@@ -15,8 +15,8 @@ Un logiciel complet et intuitif conçu pour la gestion des ventes, des factures 
 
 ## 🛠️ Technologies utilisées
 
-* **Langage / Framework :** *(Précisez ici : ex. Python, JS, PHP, Java, C#)*
-* **Base de données :** *(Précisez ici : ex. MySQL, SQLite, PostgreSQL)*
+* **Langage / Framework :** *(ex.Python)*
+* **Base de données :** *(ex.MySQL)*
 
 ---
 
