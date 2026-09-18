@@ -1,0 +1,68 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teranga Électronique — Gestion</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f5f7;color:#17202a}
+header{background:#17202a;color:white;padding:16px 20px;position:sticky;top:0;z-index:3}.brand{font-size:22px;font-weight:800}
+nav{display:flex;gap:8px;margin-top:12px;overflow:auto}nav button{white-space:nowrap;background:#344054;color:white;border:0;border-radius:8px;padding:9px 12px}
+nav button.active{background:white;color:#17202a}.wrap{max-width:1100px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{background:white;border-radius:14px;padding:16px;box-shadow:0 2px 12px #0001;margin-bottom:14px}.stat{font-size:24px;font-weight:800;margin-top:6px}
+input,select,textarea,button{width:100%;padding:10px;border:1px solid #d0d5dd;border-radius:8px;font-size:14px}textarea{min-height:80px}
+button.primary{background:#17202a;color:white;border:0;font-weight:700;cursor:pointer}button.red{background:#b42318;color:white;border:0}button.gray{background:#667085;color:white;border:0}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:9px;border-bottom:1px solid #eaecf0;text-align:left;font-size:13px}
+.total{text-align:right;font-size:21px;font-weight:800;margin-top:12px}.muted{color:#667085;font-size:13px}.actions{display:flex;gap:8px}.actions>*{flex:1}
+@media(max-width:750px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}table{display:block;overflow:auto;white-space:nowrap}}
+@media print{header,.no-print{display:none!important}.wrap{padding:0}.page{display:block!important}.page:not(#factures){display:none!important}.card{box-shadow:none}}
+</style></head><body>
+<header><div class="brand">TERANGA ÉLECTRONIQUE</div><div class="muted" style="color:#d0d5dd">Logiciel de gestion — Dakar</div>
+<nav><button class="active" onclick="show('dashboard',this)">📊 Tableau de bord</button><button onclick="show('factures',this)">🧾 Factures</button><button onclick="show('produits',this)">📦 Produits</button><button onclick="show('clients',this)">👤 Clients</button><button onclick="show('ventes',this)">📈 Ventes</button><button onclick="show('parametres',this)">⚙️ Paramètres</button></nav></header>
+<div class="wrap">
+
+<section id="dashboard" class="page active">
+<div class="grid"><div class="card">CA du jour<div class="stat" id="caJour">0 FCFA</div></div><div class="card">CA du mois<div class="stat" id="caMois">0 FCFA</div></div><div class="card">Factures<div class="stat" id="nbFact">0</div></div><div class="card">Produits<div class="stat" id="nbProd">0</div></div></div>
+<div class="card"><h2>Bienvenue 👋</h2><p>Utilisez <b>Factures</b> pour enregistrer vos ventes. Les produits et clients restent enregistrés sur cet appareil.</p></div></section>
+
+<section id="factures" class="page">
+<div class="card no-print"><h2>Nouvelle facture</h2><div class="grid2">
+<label>N° facture<input id="fnum"></label><label>Date<input id="fdate" type="date"></label><label>Client<input id="fclient" placeholder="Nom du client"></label><label>Téléphone<input id="ftel"></label></div>
+<h3>Produits</h3><div class="grid2"><label>Désignation<input id="fprod" placeholder="Ex. HP x360"></label><label>Quantité<input id="fq" type="number" min="1" value="1"></label><label>Prix unitaire<input id="fprice" type="number" min="0"></label><label>Garantie / observation<textarea id="fobs" placeholder="Ex. Garantie 6 mois sauf écran, disque et RAM."></textarea></label></div>
+<button class="primary" onclick="addLine()">Ajouter à la facture</button></div>
+<div class="card"><h2>FACTURE <span id="printNum"></span></h2><p><b>Client :</b> <span id="printClient">—</span> &nbsp; <b>Tél. :</b> <span id="printTel">—</span> &nbsp; <b>Date :</b> <span id="printDate">—</span></p>
+<table><thead><tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th><th class="no-print"></th></tr></thead><tbody id="lines"></tbody></table>
+<div class="total">TOTAL : <span id="factTotal">0</span> FCFA</div><p><b>Observation :</b> <span id="printObs">—</span></p><p class="muted">Teranga Électronique — Dakar • Merci pour votre confiance.</p>
+<div class="actions no-print"><button class="primary" onclick="saveInvoice()">💾 Enregistrer</button><button class="gray" onclick="window.print()">🖨️ Imprimer / PDF</button><button class="gray" onclick="newInvoice()">➕ Nouvelle</button></div></div></section>
+
+<section id="produits" class="page"><div class="card"><h2>Gestion des produits</h2><div class="grid2"><input id="pname" placeholder="Produit"><input id="pcat" placeholder="Catégorie"><input id="pprice" type="number" placeholder="Prix de vente"><input id="pstock" type="number" placeholder="Stock"></div><br><button class="primary" onclick="addProduct()">Ajouter</button></div><div class="card"><table><thead><tr><th>Produit</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th></th></tr></thead><tbody id="products"></tbody></table></div></section>
+
+<section id="clients" class="page"><div class="card"><h2>Clients</h2><div class="grid2"><input id="cname" placeholder="Nom"><input id="ctel" placeholder="Téléphone"></div><br><button class="primary" onclick="addClient()">Ajouter</button></div><div class="card"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Achats</th><th></th></tr></thead><tbody id="clients"></tbody></table></div></section>
+
+<section id="ventes" class="page"><div class="card"><h2>Historique des ventes</h2><input id="search" placeholder="Rechercher facture, client ou produit" oninput="renderSales()"><div style="overflow:auto"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Total</th><th></th></tr></thead><tbody id="sales"></tbody></table></div></div></section>
+
+<section id="parametres" class="page"><div class="card"><h2>Paramètres boutique</h2><div class="grid2"><label>Nom boutique<input id="shopname" value="Teranga Électronique"></label><label>Téléphone<input id="shoptel" placeholder="764868654"></label><label>Adresse<input id="shopaddr" placeholder="Medina, Dakar"></label><label>Garantie par défaut<textarea id="defaultWarranty">Garantie 6 mois sauf écran, disque et RAM.</textarea></label></div><br><button class="primary" onclick="saveSettings()">Enregistrer les paramètres</button><button class="gray" style="margin-top:8px" onclick="exportData()">Exporter mes données</button><p id="notice" class="muted"></p></div></section>
+</div>
+<script>
+const K='teranga_v2';let db=JSON.parse(localStorage.getItem(K)||'null')||{invoices:[],products:[],clients:[],settings:{shopname:'Teranga Électronique',shoptel:'',shopaddr:'Medina, Dakar',defaultWarranty:'Garantie 6 mois sauf écran, disque et RAM.'}};
+let lines=[];
+const $=x=>document.getElementById(x),fmt=n=>new Intl.NumberFormat('fr-FR').format(n);
+function today(){return new Date().toISOString().slice(0,10)}
+function persist(){localStorage.setItem(K,JSON.stringify(db));renderAll()}
+function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAll()}
+function nextNum(){return String(1+Math.max(0,...db.invoices.map(x=>Number(x.num)||0)))}
+function newInvoice(){lines=[];$('fnum').value=nextNum();$('fdate').value=today();$('fclient').value='';$('ftel').value='';$('fprod').value='';$('fq').value=1;$('fprice').value='';$('fobs').value=db.settings.defaultWarranty;renderInvoice()}
+function addLine(){let n=$('fprod').value.trim(),q=+$('fq').value,p=+$('fprice').value;if(!n||q<1||p<0)return alert('Remplissez le produit, la quantité et le prix.');lines.push({n,q,p});$('fprod').value='';$('fprice').value='';renderInvoice()}
+function renderInvoice(){let total=0;$('printNum').textContent=$('fnum').value;$('printClient').textContent=$('fclient').value||'—';$('printTel').textContent=$('ftel').value||'—';$('printDate').textContent=$('fdate').value||'—';$('printObs').textContent=$('fobs').value||'—';$('lines').innerHTML=lines.map((x,i)=>{let t=x.q*x.p;total+=t;return `<tr><td>${esc(x.n)}</td><td>${x.q}</td><td>${fmt(x.p)}</td><td>${fmt(t)}</td><td class="no-print"><button class="red" onclick="lines.splice(${i},1);renderInvoice()">X</button></td></tr>`}).join('');$('factTotal').textContent=fmt(total)}
+function saveInvoice(){if(!lines.length)return alert('Ajoutez au moins un produit.');let total=lines.reduce((s,x)=>s+x.q*x.p,0);let inv={num:$('fnum').value,date:$('fdate').value,client:$('fclient').value||'Client',tel:$('ftel').value,obs:$('fobs').value,lines:[...lines],total};db.invoices.push(inv);let c=db.clients.find(x=>x.name.toLowerCase()==inv.client.toLowerCase());if(c)c.purchases=(c.purchases||0)+total;else db.clients.push({name:inv.client,tel:inv.tel,purchases:total});lines=[];persist();alert('Facture enregistrée.');newInvoice()}
+function addProduct(){let name=$('pname').value.trim();if(!name)return;db.products.push({name,cat:$('pcat').value,price:+$('pprice').value||0,stock:+$('pstock').value||0});$('pname').value='';$('pcat').value='';$('pprice').value='';$('pstock').value='';persist()}
+function addClient(){let name=$('cname').value.trim();if(!name)return;db.clients.push({name,tel:$('ctel').value,purchases:0});$('cname').value='';$('ctel').value='';persist()}
+function delProd(i){db.products.splice(i,1);persist()}function delClient(i){db.clients.splice(i,1);persist()}
+function renderAll(){renderInvoice();$('products').innerHTML=db.products.map((p,i)=>`<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${fmt(p.price)} FCFA</td><td>${p.stock}</td><td><button class="red" onclick="delProd(${i})">Supprimer</button></td></tr>`).join('');$('clients').innerHTML=db.clients.map((c,i)=>`<tr><td>${esc(c.name)}</td><td>${esc(c.tel||'')}</td><td>${fmt(c.purchases||0)} FCFA</td><td><button class="red" onclick="delClient(${i})">Supprimer</button></td></tr>`).join('');renderSales();let d=today(),month=d.slice(0,7);$('caJour').textContent=fmt(db.invoices.filter(x=>x.date==d).reduce((s,x)=>s+x.total,0))+' FCFA';$('caMois').textContent=fmt(db.invoices.filter(x=>x.date.startsWith(month)).reduce((s,x)=>s+x.total,0))+' FCFA';$('nbFact').textContent=db.invoices.length;$('nbProd').textContent=db.products.length}
+function renderSales(){let q=($('search')?.value||'').toLowerCase();$('sales').innerHTML=db.invoices.filter(x=>(x.num+' '+x.client+' '+x.lines.map(y=>y.n).join(' ')).toLowerCase().includes(q)).slice().reverse().map(x=>`<tr><td>${x.num}</td><td>${x.date}</td><td>${esc(x.client)}</td><td>${fmt(x.total)} FCFA</td><td><button class="gray" onclick="reprint(${JSON.stringify(x).replaceAll('&quot;','')} )">Voir</button></td></tr>`).join('')}
+function reprint(x){$('fnum').value=x.num;$('fdate').value=x.date;$('fclient').value=x.client;$('ftel').value=x.tel||'';$('fobs').value=x.obs||'';lines=x.lines;show('factures',document.querySelectorAll('nav button')[1]);renderInvoice();window.scrollTo(0,0)}
+function saveSettings(){db.settings={shopname:$('shopname').value,shoptel:$('shoptel').value,shopaddr:$('shopaddr').value,defaultWarranty:$('defaultWarranty').value};persist();$('notice').textContent='Paramètres enregistrés.'}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='teranga-donnees.json';a.click()}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+['fnum','fdate','fclient','ftel','fobs'].forEach(id=>$(id).addEventListener('input',renderInvoice));
+$('fdate').value=today();$('fnum').value=nextNum();$('fobs').value=db.settings.defaultWarranty;
+$('shopname').value=db.settings.shopname;$('shoptel').value=db.settings.shoptel;$('shopaddr').value=db.settings.shopaddr;$('defaultWarranty').value=db.settings.defaultWarranty;
+renderAll();
+</script></body></html>
